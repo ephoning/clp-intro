@@ -2,32 +2,22 @@
   (:require [clojure.core.logic :refer :all]
             [clp-intro.basics :refer :all]))
 
-;; --------------------------------------
-;; CLP
-;; V4
-;; - the to/from peano marshalling is now fully hidden AND without embedded 'run*' call
-(defn addo-peano-V4 [x y s]
+
+(defn to-lvar [a aL]
+  (== aL (if (keyword? a) aL (to-peano a))))
+
+;; - takes REGULAR vars, NOT lvars!! => CANNOT COMPOSE with other o-function inside run* or fresh scope
+;; - the lvar 'r' has to be passed-in from the outer scope so it can be unified with the result
+(defn addo [x y s r]
   (fresh [xL yL sL]
-    ;; unify LVars with themselves (no-op) or ("assign to") passed-in values...
-    ;; (in other words: we "promote" the keywords to actual LVars)
-    (== xL (if (keyword? x) xL (to-peano x)))
-    (== yL (if (keyword? y) yL (to-peano y)))
-    (== sL (if (keyword? r) sL (to-peano s)))
-    ;; actual constraint resolution...
-    (appendo xL yL sL)
-    ;; unify "result LVar" with the bundled result
-    (vector (from-peano-single xL) (from-peano-single yL) (from-peano-single sL))))
+         (to-lvar x xL)
+         (to-lvar y yL)
+         (to-lvar s sL)
+         (appendo xL yL sL)
+         (== r (vector xL yL sL))))
 
-;; OK: example of using the addo-peano CLP function inside a regular function
-(defn example-addo-peano-V4-single-constraint [x y s]
-  (run* [q]
-    (== q (addo-peano-V4 x y s))))
-
-;; FAIL: attempt at using the addo-peano CLP function with added constraint(s)
-(defn example-addo-peano-V4-multiple-constraints [x y s]
-  (run* [q]
-    (fresh [xL yL]
-      (== xL x)
-      (== yL y)
-      (== xL yL) ;; force the numbers that add up to 'r' to be equal
-      (== q (addo-peano-V4 xL yL s)))))
+;; NOTE: ONLY the result of 'run* [q]' is a reified / non-lvar value =>
+;; we cannot marshall the nested list of Peano numbers to regular integers *INSIDE' the body of run*
+(defn run*-addo [x y s]
+  (run* [qL]
+        (addo x y s qL)))

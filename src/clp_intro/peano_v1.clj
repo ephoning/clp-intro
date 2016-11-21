@@ -3,12 +3,10 @@
             [clp-intro.basics :refer :all]))
 
 ;; --------------------------------------
-;; CLP
-;; V1
 ;; - cannot deal with multiple LVars, only one...
 ;; - have to extract the 'first' element from the result of 'run*'
 ;;
-(defn addo-peano-V1 [x y s]
+(defn addo-peano [x y s]
   (cond
     (keyword? x) (let [yP (to-peano y)
                        sP (to-peano s)
