@@ -8,7 +8,7 @@ Backward execution:
 
 ## Examples
 
-- Peano number addition: 
+- Peano number addition:
       - ***see code...***
 - List/seq append / concat
       - ***see code...***
@@ -16,13 +16,26 @@ Backward execution:
 ## How To Use
 
 Unlikely "in isolation"; more likely embedded within regular Clojure code.
-Therefore: 
+Therefore:
 
 - How to combine / compose with regular functions?
      - calling CLP functions from within regular functions
      - calling regular functions from within CLP functions
 - Also: how to compose CLP functions themselves?
 
+## My View...
+
+- A mental image / analogy?:
+
+  Monads
+  - using core.logic forms gets you into a 'Monad': once in you stay in
+  - you can introduce values into lvar through unification (Monad type constructor)
+  - ONLY the "top level" construct 'run* gets you out
+
+  Quanta
+  - lvars are "quantum objects": they a the superposition of states (all possible values)
+    that match the current constraints
+  - by "looking at them" (i.e., calling 'run*') they collapse into regular values
 
 ## Questions
 
@@ -31,7 +44,7 @@ Therefore:
   CLP-F is also non-primitive and can be expressed using a CLP-P?
 
 - How about Integer / Float arithmetic?
-    - Integer is *countable infinite*, so at least a lazy approach could work 
+    - Integer is *countable infinite*, so at least a lazy approach could work
     - Float is *uncountable infinite*, so no go
     - or are we restricted to types with *GROUNDED VALUES* / algebraic types? (seem that way, no?)
 

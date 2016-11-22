@@ -9,11 +9,17 @@
 
 
 ;; --------------------------------------
-;; strategy:
+;; Strategy:
 ;; - use a "nested run*" to force reification of the peano addition into
 ;;   triplets of regular natural numbers
-;; - deconstruct this reified result using membero/firsto/resto to allow further
-;;   handling / constraint enforcement
+
+;; Peano addition
+;; NOTE: this function returns a list of triplets
+;;       clojure.ore.logic o-functions do NOT return values but are instead 'unification actions'
+;; KEY DIFFERENCE:
+;; - addo-peano can feature in a nested position within a unification action
+;; - o-functions CANNOT feature in a nested position / as arguments to other o-functions as
+;;   they do not return useful values
 (defn addo-peano [x y s]
   (apply from-peano-nested
          (run* [q]
@@ -29,11 +35,13 @@
 ;; get those numbers x and y that are the same that add up to s
 ;; note:
 ;; - the result of addo-peano is a reified list of triplets that, in order to feature
-;; - in further constraint processing has to be deconstructed into lvars again
+;; - in further constraint processing has to be deconstructed into lvars again:
+;; - deconstruct this reified result using membero/firsto/resto to allow further
+;;   handling / constraint enforcement
 (defn addo-peano-samo [x y s]
   (run* [q]
     (fresh [addoL xL yL accuL tripletsL pairsL]
-      (== addoL (addo-peano x y s))
+      (== addoL (addo-peano x y s)) ;; NOTE:
       (membero tripletsL addoL) ;; "break up"" addoL into triplets"
       (firsto tripletsL xL)     ;; extract the 'car' from the triplet
       (resto tripletsL pairsL)
