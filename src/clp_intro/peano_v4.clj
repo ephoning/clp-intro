@@ -14,7 +14,10 @@
 ;;   triplets of regular natural numbers
 
 ;; Peano addition
-;; NOTE: this function returns a list of triplets
+;; NOTE: this function returns a list of triplets of natural numbers
+;;       we HAVE to reify in order to unmarshal from peano notation
+;;       (i.e. hide the to/from Peano notation)
+;;       => we HAVE to wrap all constraint actions into a 'run*' call
 ;;       clojure.ore.logic o-functions do NOT return values but are instead 'unification actions'
 ;; KEY DIFFERENCE:
 ;; - addo-peano can feature in a nested position within a unification action
