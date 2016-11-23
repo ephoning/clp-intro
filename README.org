@@ -42,6 +42,7 @@ Therefore:
   Quanta
   - lvars are "quantum objects": they are the superposition of states (all possible values)
     that match the current constraints
+  - by unifying them, lvar become 'entangled': changing one chances the state of the other
   - By "looking at them" (i.e., calling 'run*') the "query lvar" 'q' collapses into a regular value
 
 ** Questions
