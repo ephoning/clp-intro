@@ -6,21 +6,23 @@ Backward execution:
 
 - regular functional:
 #+BEGIN_SRC Clojure
-(cons 1 '(2 3))  =>  '(1 2 3)
+(cons 1 '(2 3))  ->  '(1 2 3)
 #+END_SRC
 - CLP:
 #+BEGIN_SRC Clojure
-(conso 1 _ '(1 2 3))   => _ unifies with '(2 3)
+(conso 1 _ '(1 2 3))   ->  _ unifies with '(2 3)
 #+END_SRC
 
 ** Examples
 
 - Peano number addition:
       - ***see code...***
+
 - List/seq append / concat
+      - 'appendo' is built-in, but can we define it ourselves in terms of other o-primitives
       - ***see code...***
 
-** How To Use
+** How And When To Use?
 
 Unlikely "in isolation"; more likely embedded within regular Clojure code.
 Therefore:
@@ -30,19 +32,17 @@ Therefore:
      - calling regular functions from within CLP functions
 - Also: how to compose CLP functions themselves?
 
+
 ** My Hyperbolical View...
 
-- A mental image / analogy?:
-
   Monads
-  - using core.logic forms gets you into a 'Monad': once in you stay in
-  - you can introduce values into lvar through unification (Monad type constructor)
-  - ONLY the "top level" construct 'run* gets you out and reifies lvars into regular values
+  - run* scope gets you into a 'Monad': once in you stay in; run* reifies 'q' into a regular value
+  - You can introduce values into an lvar through unification (Monad type constructor), NOT assignment
 
   Quanta
-  - lvars are "quantum objects": they a the superposition of states (all possible values)
+  - lvars are "quantum objects": they are the superposition of states (all possible values)
     that match the current constraints
-  - by "looking at them" (i.e., calling 'run*') they collapse into regular values
+  - By "looking at them" (i.e., calling 'run*') the "query lvar" 'q' collapses into a regular value
 
 ** Questions
 
@@ -54,7 +54,6 @@ Therefore:
     - Integer is *countable infinite*, so at least a lazy approach could work
     - Float is *uncountable infinite*, so no go
     - or are we restricted to types with *GROUNDED VALUES* / algebraic types? (seem that way, no?)
-
 
 (*) Easy: we can think of a simple recipe to get from a functional to CLP equivalent implementation
 
