@@ -1,7 +1,17 @@
 #+STARTUP: showall
-* clp-intro
+* Introduction to core.logic
 
-** Constraint Logic Programming
+** Logic Programming
+
+- Prolog style programming *(very brief intro)*
+- Constraint logic programming *(intro)*
+- Nominal logic programming *(not covered)*
+- Using core.logic constructs in regular Clojure programs *(very brief intro)*
+
+*** Prolog Style Programming
+
+
+*** Contrain Logic Programming
 
 Backward execution:
 
@@ -14,16 +24,7 @@ Backward execution:
 (conso 1 _ '(1 2 3))   ->  _ unifies with '(2 3)
 #+END_SRC
 
-** Examples
-
-- Peano number addition:
-      - ***see code...***
-
-- List/seq append / concat
-      - 'appendo' is built-in, but can we define it ourselves in terms of other o-primitives
-      - ***see code...***
-
-** How And When To Use?
+**** How And When To Use?
 
 Unlikely "in isolation"; more likely embedded within regular Clojure code.
 Therefore:
@@ -33,20 +34,27 @@ Therefore:
      - calling regular functions from within CLP functions
 - Also: how to compose CLP functions themselves?
 
+**** Examples
 
-** My Hyperbolical View...
+- Peano number addition:
+      - ***see code...***
+- append
+      - 'appendo' is built-in, but can we define it ourselves in terms of other o-primitives
+      - ***see code...***
+- member
+      - ***see code...***
 
-  Monads
-  - run* scope gets you into a 'Monad': once in you stay in; run* reifies 'q' into a regular value
-  - You can introduce values into an lvar through unification (Monad type constructor), NOT assignment
+**** Some Learnings
 
-  Quanta
-  - lvars are "quantum objects": they are the superposition of states (all possible values)
-    that match the current constraints
-  - by unifying them, lvar become 'entangled': changing one chances the state of the other
-  - By "looking at them" (i.e., calling 'run*') the "query lvar" 'q' collapses into a regular value
+- relational operators do not return values; pass in lvar argument to unify with result instead
+- relational operator are more like actions ("hidden side-effects"), so do not nest but provide one after the other
+- ordering of invocations of relational operators is irrelevant (BUT might cause non-termination!)
+    - make sure to order clauses in a run* or fresh body such that a recursive call comes last
+- cannot use sequence functions to extract parts of a value, but we can use "constructors"
+    - most notably: (l)cons (tries to unify an lvar with a dotted pair / improper list)
+- in short: relations do NOT behave like regular functions; they "communicate" through the lvars introduced by run* or fresh
 
-** Questions
+**** Questions
 
 - Given a function, is it "easy" (*) to derive the CLP-equivalent?
 - Given a non-primitive function F based on primitive P, does that imply that
@@ -55,9 +63,27 @@ Therefore:
 - How about Integer / Float arithmetic?
     - Integer is *countable infinite*, so at least a lazy approach could work
     - Float is *uncountable infinite*, so no go
-    - or are we restricted to types with *GROUNDED VALUES* / algebraic types? (seem that way, no?)
-
+    - or are we restricted to types with *GROUNDED VALUES* / algebraic types?
+      (seem that way, no?: see core.logic.arithmetic: ONLY provides comparison operators for numbers - to be used as predicates/tests within run* / fresh bodies)
 (*) Easy: we can think of a simple recipe to get from a functional to CLP equivalent implementation
+
+*** Using core.logic Constructs In Regular Clojure Programs
+
+Caveat: core.logic wiki incorrect (or outdated?) on some of the syntax as used in the examples. For example:
+#+BEGIN_SRC Clojure
+(unifier '(?x ?y ?z) '(1 2 ?y)) ; (1 2 _.0)
+#+END_SRC
+should be:
+#+BEGIN_SRC Clojure
+(unifier ['(?x ?y ?z) '(1 2 ?y)]) ; {?y 2, ?x 1, ?z 2}
+#+END_SRC
+
+
+** To Explore
+
+-  https://github.com/clojure/core.logic/wiki/Features
+- https://rawgit.com/dedeibel/clojure-core-logic-cheatsheets/master/out/cheatsheet-use-title-attribute-no-cdocs-summary.html
+- https://github.com/clojure/core.logic/wiki/Differences-from-The-Reasoned-Schemer
 
 
 (NOTE TO SELF: render this as HTML in browser with: C-c C-e h o)
