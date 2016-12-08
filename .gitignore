@@ -10,3 +10,6 @@ pom.xml.asc
 .hgignore
 .hg/
 .idea/
+*.iml
+.DS_Store
+README.html

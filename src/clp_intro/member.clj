@@ -6,8 +6,8 @@
   [x l]
   (cond
     (empty? l) false
-    (first x l) l
-    else (member x (rest l))))
+    (= x (first l)) l
+    :else (member x (rest l))))
 
 (defn membero
   "find in seq + return remainder - relational"
