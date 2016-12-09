@@ -3,15 +3,12 @@
 
 ** Logic Programming
 
-- Prolog style programming *(very brief intro)*
+- Prolog style programming *(not covered)*
 - Constraint logic programming *(intro)*
 - Nominal logic programming *(not covered)*
-- Using core.logic constructs in regular Clojure programs *(very brief intro)*
+- Mixing functional with core.logic relational programming *(intro)*
 
-*** Prolog Style Programming
-
-
-*** Contrain Logic Programming
+*** Constraint logic programming *(intro)*
 
 Backward execution:
 
@@ -49,7 +46,7 @@ Therefore:
 - relational operators do not return values; pass in lvar argument to unify with result instead
 - relational operator are more like actions ("hidden side-effects"), so do not nest but provide one after the other
 - ordering of invocations of relational operators is irrelevant (BUT might cause non-termination!)
-    - make sure to order clauses in a run* or fresh body such that a recursive call comes last
+    - hint: make sure to order clauses in a run* or fresh body such that a recursive call comes last
 - cannot use sequence functions to extract parts of a value, but we can use "constructors"
     - most notably: (l)cons (tries to unify an lvar with a dotted pair / improper list)
 - in short: relations do NOT behave like regular functions; they "communicate" through the lvars introduced by run* or fresh
@@ -67,8 +64,15 @@ Therefore:
       (seem that way, no?: see core.logic.arithmetic: ONLY provides comparison operators for numbers - to be used as predicates/tests within run* / fresh bodies)
 (*) Easy: we can think of a simple recipe to get from a functional to CLP equivalent implementation
 
-*** Using core.logic Constructs In Regular Clojure Programs
+*** Mixing functional with core.logic relational programming *(intro)*
 
+**** Calling functions from relations
+
+
+**** Calling relations from functions
+
+
+**** Bare-bones usage
 Caveat: core.logic wiki incorrect (or outdated?) on some of the syntax as used in the examples. For example:
 #+BEGIN_SRC Clojure
 (unifier '(?x ?y ?z) '(1 2 ?y)) ; (1 2 _.0)
@@ -78,12 +82,51 @@ should be:
 (unifier ['(?x ?y ?z) '(1 2 ?y)]) ; {?y 2, ?x 1, ?z 2}
 #+END_SRC
 
+*****Minikanren / core.logic.unifier  versus clojure.core.unify
+
+#+BEGIN_SRC Clojure
+
+=> (require '[clojure.core.logic.unifier :as cclu] '[clojure.core.unify :as ccu])
+
+=> (cclu/unifier ['(?x ?y ?z) '(1 2 ?y)])     ; {?y 2, ?x 1, ?z 2}  <= CORRECT (everything is unifyable)
+
+=> (cclu/unifier ['(?x) '(?x)])               ; {}                  <= CORRECT (no restrictions on '?x')
+
+=> (cclu/unifier ['(?x ?y) '(?x 42)])         ; {?y 42}             <= CORRECT (no restrictions on '?x')
+
+=> (cclu/unifier ['(?x ?x) '(1 2)])           ; nil                 <= CORRECT (value mismatch)
+
+=> (cclu/unifier ['(?x (?x)) '(1 1)])         ; nil                 <= CORRECT (structure mismatch)
+
+=> (cclu/unifier ['(?x 2) '(1 ?y ?z)])        ; nil                 <= CORRECT (structure mismatch)
+
+=> (cclu/unifier ['(?x) '(1 2)])              ; nil                 <= CORRECT (structure mismatch)
+
+
+=> (ccu/unifier '(?x ?y ?z) '(1 2 ?y))       ; (1 2 2)              <= CORRECT
+
+=> (ccu/unifier '(?x) '(?x))                 ; (?x)                 <= CORRECT
+
+=> (ccu/unifier '(?x ?y) '(?x 42))           ; (?x 42)              <= CORRECT
+
+=> (ccu/unifier '(?x ?x) '(1 2))             ; (1 2)                <= WRONG
+
+=> (ccu/unifier '(?x (?x)) '(1 1))           ; (1 1)                <= WRONG
+
+=> (ccu/unifier '(?x 2) '(1 ?y ?z))          ; (1 2 ?z)             <= WRONG
+
+=> (ccu/unifier '(?x) '(1 2))                ; (1 2)                <= WRONG
+
+#+END_SRC
+
 
 ** To Explore
 
--  https://github.com/clojure/core.logic/wiki/Features
+- https://github.com/clojure/core.logic/wiki/Features
 - https://rawgit.com/dedeibel/clojure-core-logic-cheatsheets/master/out/cheatsheet-use-title-attribute-no-cdocs-summary.html
 - https://github.com/clojure/core.logic/wiki/Differences-from-The-Reasoned-Schemer
+- https://www.youtube.com/watch?v=iCuVTGWNU3s
+- https://github.com/swannodette/logic-tutorial
 
 
 (NOTE TO SELF: render this as HTML in browser with: C-c C-e h o)
