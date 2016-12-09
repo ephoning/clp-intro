@@ -73,6 +73,9 @@ Therefore:
 
 
 **** Bare-bones usage
+
+***** Minikanren / core.logic.unifier versus clojure.core.unify
+
 Caveat: core.logic wiki incorrect (or outdated?) on some of the syntax as used in the examples. For example:
 #+BEGIN_SRC Clojure
 (unifier '(?x ?y ?z) '(1 2 ?y)) ; (1 2 _.0)
@@ -81,8 +84,6 @@ should be:
 #+BEGIN_SRC Clojure
 (unifier ['(?x ?y ?z) '(1 2 ?y)]) ; {?y 2, ?x 1, ?z 2}
 #+END_SRC
-
-*****Minikanren / core.logic.unifier  versus clojure.core.unify
 
 #+BEGIN_SRC Clojure
 
