@@ -40,6 +40,7 @@
 ;; (relational)
 
 (defn addo-peano [x y s]
+  "sum of 2 peano numbers"
   (run* [q]
     (fresh [xL yL sL]
       (to-lvar x xL)
@@ -49,10 +50,19 @@
       (== q (list xL yL sL)))))
 
 (defn subo-peano [x y d]
+  "difference between 2 peano numbers"
   (let [r (addo-peano d y x)]
     (loop [l r accu ()]
       (if (empty? l) accu
           (recur (rest l) (cons (let [[d y x] (first l)] `(~x ~y ~d)) accu))))))
+
+(defn multo-peano [x y p]
+  "product of 2 peano numbers"
+  )
+
+(defn divo-peano [x y q]
+  "quotient of 2 peano numbers"
+  )
 
 ;; examples:
 ;; (from-peano (addo-peano (to-peano 1) (to-peano 2) :s))  ; ((1 2 3))
