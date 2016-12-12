@@ -48,7 +48,7 @@
 ;;
 (defn to-lvar
   "unify lvar with itself (no-op) or passed-in value
-  (this, in effect, 'promotes' a keyword to actual lvar)"
+  (this, in effect, 'promotes' all arguments to lvars; keywords to fresh lvars)"
   [v vL]
   (== vL (if (keyword? v) vL v)))
 
@@ -121,12 +121,12 @@
   "x * y = p
    fix for introduction of lvars as head elements: unify head elements with S
    but results can look like:
-  (peano->n (mult-r 0 :y 0)) ; ((0 :any 0) (0 0 0))
-  reason: TODO"
+   (mult-r 0 :y 0) ; ((0 _0 0) (0 0 0))
+   reason: input matches multiple conde clauses"
   [x y p]
   (conde
-   [(== () x) (== () p)]
-   [(== () y) (== () p)]
+   [(== () x) (== () p)] ; this clause results in (mult-r :x 0 0) giving (0 0 0)
+   [(== () y) (== () p)] ; this clause results in (mult-r :x 0 0) giving (_0 0 0)
    [(fresh [xt yt c]
       (== (lcons \S xt) x)
       (== (lcons \S yt) y)
@@ -134,16 +134,17 @@
       (multo-v3 xt y c))]))
 
 (defn multo-v4
-  "x * y = p"
+  "x * y = p
+   fix for generating both the generic (univ quantification) and specific case when dealing with '0's"
   [x y p]
   (conde
-   [(== () x) (== () p)]
-   [(== () y) (== () p)]
+   [(== () x) (lvaro y) (== () p)] ; adding 'lvaro' constraint avoids: (mult-r :x 0 0) ; (0 0 0)
+   [(lvaro x) (== () y) (== () p)] ; adding 'lvaro' constraint avoids: (mult-r 0 :y 0) ; (0 0 0)
    [(fresh [xt yt c]
       (== (lcons \S xt) x)
       (== (lcons \S yt) y)
       (appendo y c p)
-      (multo-v4 xt y c))]))
+      (multo-v3 xt y c))]))
 
 (def multo multo-v4)
 
@@ -155,7 +156,9 @@
 (defn mult-r
   "x * y = p"
   ([x y p] (peano->n (mult-peano-r (n->peano x) (n->peano y) (n->peano p))))
-  ([x y p n] (peano->n (mult-peano-r (n->peano x) (n->peano y) (n->peano p) n))))
+  ([x y p n] (peano->n (mult-peano-r (n->peano x) (n->peano y) (n->peano p) n)))
+  ; ([x y p n] (mult-peano-r (n->peano x) (n->peano y) (n->peano p) n))
+  )
 
 
 (defn div-peano-r
