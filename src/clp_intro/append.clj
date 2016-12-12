@@ -12,7 +12,7 @@
   (conde
    [(== '() l) (== s out)]
    [(fresh [a d r]
-      (== (lcons a d) l)
+      (== (lcons a d) l)  ; (also implies l != ())
       (== (lcons a r) out)
       (appendo d s r))])) ; make recursive call last to avoid non-termination
                           ; when asking for non-existent answers
