@@ -124,17 +124,22 @@
   (call-run* multo-v3 x y p))
 
 (defn mult-r [x y p]
-;;  (peano->n (mult-peano-r (n->peano x) (n->peano y) (n->peano p)))
+  ;;  (peano->n (mult-peano-r (n->peano x) (n->peano y) (n->peano p)))
   (mult-peano-r (n->peano x) (n->peano y) (n->peano p))
   )
 
 
+(defn div-peano-r [x y q]
+  "difference between 2 peano numbers"
+  (let [r (mult-peano-r q y x)]
+    (loop [l r accu ()]
+      (if (empty? l) accu
+          (recur (rest l) (cons (let [[q y x] (first l)] `(~x ~y ~q)) accu))))))
+
 (defn div-r [x y q]
   "quotient of 2 peano numbers"
-  )
+  (peano->n (div-peano-r (n->peano x) (n->peano y) (n->peano q)))  )
 
-(defn divo [x y q]
-  (peano->n (mult-peano-r (n->peano x) (n->peano y) (n->peano q))))
 
 ;; examples:
 ;; (from-peano (addo-peano (to-peano 1) (to-peano 2) :s))  ; ((1 2 3))
