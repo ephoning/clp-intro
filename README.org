@@ -33,7 +33,7 @@ Therefore:
 
 **** The main concepts / operators
 
-- run* / run n
+- run* / run <n>
      - interface to regular Clojure
 - lvar
      - logical variable
@@ -43,6 +43,8 @@ Therefore:
      - introduction of new lvars
 - conde
      - try every alternative
+- lvaro, nonlvaro
+     - non-relational goals ("predicates")
 
 **** Examples
 
@@ -50,8 +52,6 @@ Therefore:
       - ***see code...***
 - append
       - 'appendo' is built-in, but can we define it ourselves in terms of other o-primitives
-      - ***see code...***
-- member
       - ***see code...***
 
 **** Some Learnings
