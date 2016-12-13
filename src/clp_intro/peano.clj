@@ -148,50 +148,77 @@
       (appendo y c p)
       (multo-v3 xt y c))]))
 
+(defn zero-n [v] (all (nonlvaro v) (== () v)))
+(defn nonzero-n [v] (fresh[t] (nonlvaro v) (== (lcons \S t) v)))
+(defn nonzero-ln [v] (conde [(nonzero-n v)] [(lvaro v)]))
+
 (defn multo-v5
   "x * y = p
-   fix for 0 * y = 0
-   NOTE: can we avoid having to spec out all valid 0/n/lvar permutations (13 - see below) across x y p?"
+   fix for ALL argument combinations containing at least one 0
+   NOTE: can we avoid having to spec out all valid 0/n/lvar permutations (see below) across x y p?"
   [x y p]
   (conde
-   [] ; 0 :y :p  <all>-0
-   [] ; 0  n :p  0
-   [] ; 0 :y  n  discard: no solution
-   [] ; 0  n  n  discard: no solution
+   [(zero-n x) (lvaro y)     (lvaro p)  (== () p)]   ;  0 :y :p  <all>-0
+   [(zero-n x) (nonzero-n y) (lvaro p)  (== () p)]   ;  0  n :p  0
+   ; 0 :y  n  discard: no solution
+   ; 0  n  n  discard: no solution
+   [(lvaro x) (zero-n y) (lvaro p)      (== () p)]   ; :x  0 :p  <all>-0
+   ; :x 0  n  discard: no solution
+   [(nonzero-n x) (zero-n y)(lvaro p)   (== () p)]   ;  n  0 :p  0
+   ;  n 0  n  discard: no solution
+   [(lvaro x) (lvaro y) (zero-n p)      (== () x)]   ; :x :y  0  <all>-0 / 0-<all>
+   [(lvaro x) (lvaro y) (zero-n p)      (== () y)]   ; :x :y  0  <all>-0 / 0-<all>
+   [(nonzero-n x) (lvaro y) (zero-n p)  (== () y)]   ;  n :y  0  0
+   [(lvaro x) (nonzero-n y) (zero-n p)  (== () x)]   ; :x  n  0  0
+   ;  n  n 0  discard: no solution
+   [(zero-n x) (zero-n y) (lvaro p)     (== () p)]   ;  0  0 :p  0
+   ;  0 0  n  discard: no solution
+   [(zero-n x) (lvaro y) (zero-n p)]                 ;  0 :y  0  <all>
+   [(zero-n x) (nonzero-n y) (zero-n p)]             ;  0  n  0
+   [(lvaro x)  (zero-n y) (zero-n p)]                ; :x  0  0  <all>
+   [(nonzero-n x) (zero-n y) (zero-n p)]             ;  n  0  0
+   [(zero-n x) (zero-n y) (zero-n p)]                ;  0  0  0
 
-   [] ; :x 0 :p  <all>-0
-   [] ; :x 0  n  discard: no solution
-   [] ;  n 0 :p  0
-   [] ;  n 0  n  discard: no solution
-
-   [] ; :x :y 0  <all>-0 / 0-<all>
-   [] ;  n :y 0  0
-   [] ; :x  n 0  0
-   [] ;  n  n 0  discard: no solution
-
-   [] ;  0 0 :p  0
-   [] ;  0 0  n  discard: no solution
-
-   [] ; 0 :y 0  <all>
-   [] ; 0  n 0
-
-   [] ; :x 0 0  <all>
-   [] ;  n 0 0
-
-   [] ;  0 0 0
-
-   [(fresh [t] (lvaro x) (== () x) (nonlvaro y) (== (lcons \S t) y) (nonlvaro p) (== () p))] ; (mult-r :x n 0) ; (0 0 0)
-   [(fresh [t] (nonlvaro x) (== (lcons \S t) x) (lvaro y) (== () y) (nonlvaro p) (== () p))] ; (mult-r n :y 0) ; (0 0 0)
-   [(== () x) (lvaro y) (nonlvaro p) (== () p)] ; (mult-r 0 :y 0) ; (0 _0 0)
-   [(lvaro x) (== () y) (nonlvaro p) (== () p)] ; (mult-r :y 0 0) ; (_0 0 0)
-   [(lvaro x) (nonlvaro y) ]
    [(fresh [xt yt c]
       (== (lcons \S xt) x)
       (== (lcons \S yt) y)
       (appendo y c p)
       (multo-v3 xt y c))]))
 
-(def multo multo-v5)
+(defn multo-v6
+  "x * y = p
+   replace multiple  combinations that can be subsumed by a single alternative"
+  [x y p]
+  (conde
+   [(zero-n x) (lvaro y)     (lvaro p)  (== () p)]   ;  0 :y :p  <all>-0
+   [(zero-n x) (nonzero-n y) (lvaro p)  (== () p)]   ;  0  n :p  0
+
+   [(lvaro x) (zero-n y) (lvaro p)      (== () p)]   ; :x  0 :p  <all>-0
+   [(nonzero-n x) (zero-n y)(lvaro p)   (== () p)]   ;  n  0 :p  0
+
+   [(lvaro x) (lvaro y) (zero-n p)      (== () x)]   ; :x :y  0  <all>-0 / 0-<all>
+   [(lvaro x) (lvaro y) (zero-n p)      (== () y)]   ; :x :y  0  <all>-0 / 0-<all>
+   [(nonzero-n x) (lvaro y) (zero-n p)  (== () y)]   ;  n :y  0  0
+   [(lvaro x) (nonzero-n y) (zero-n p)  (== () x)]   ; :x  n  0  0
+
+   [(zero-n x) (zero-n y) (lvaro p)     (== () p)]   ;  0  0 :p  0
+
+   ;; [(zero-n x) (lvaro y) (zero-n p)]                 ;  0 :y  0  <all>
+   ;; [(zero-n x) (nonzero-n y) (zero-n p)]             ;  0  n  0
+   [(zero-n x) (nonzero-ln y) (zero-n p)]               ;  0  _  0
+
+   ;; [(nonzero-n x) (zero-n y) (zero-n p)]             ;  n  0  0
+   ;; [(lvaro x)  (zero-n y) (zero-n p)]                ; :x  0  0  <all>
+   ;; [(zero-n x) (zero-n y) (zero-n p)]                ;  0  0  0
+   [(zero-n y) (zero-n p)]                              ;  _  0  0
+
+   [(fresh [xt yt c]
+      (== (lcons \S xt) x)
+      (== (lcons \S yt) y)
+      (appendo y c p)
+      (multo-v3 xt y c))]))
+
+(def multo multo-v6)
 
 (defn mult-peano-r
   "product of 2 peano numbers"
