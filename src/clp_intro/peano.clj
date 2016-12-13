@@ -104,7 +104,7 @@
 (defn multo-v2
   "x * y = p
    semi-broken; now terminats for the following argument sets: (:x () (S ...)) (:x :y (S ...))
-   but results look like:
+   but results (in peano notation) look like:
    (mult-r :x :y 3) ; (((_0 _1 _2) (S) (S S S)) ((_0) (S S S) (S S S)))
    reason: head elements (i.e., lvars a & d below) are/remain lvars"
   [x y p]
@@ -120,7 +120,7 @@
 (defn multo-v3
   "x * y = p
    fix for introduction of lvars as head elements: unify head elements with S
-   but results can look like:
+   but results can be:
    (mult-r 0 :y 0) ; ((0 _0 0) (0 0 0))
    reason: input matches multiple conde clauses"
   [x y p]
@@ -135,7 +135,9 @@
 
 (defn multo-v4
   "x * y = p
-   fix for generating both the generic (univ quantification) and specific case when dealing with '0's"
+   fix for generating both the generic (univ quantification) and specific case when dealing with '0's
+   but the following results in 'no solution':
+   (mult-r :x 23 0) ; 0"
   [x y p]
   (conde
    [(== () x) (lvaro y) (== () p)] ; adding 'lvaro' constraint avoids: (mult-r :x 0 0) ; (0 0 0)
@@ -146,7 +148,50 @@
       (appendo y c p)
       (multo-v3 xt y c))]))
 
-(def multo multo-v4)
+(defn multo-v5
+  "x * y = p
+   fix for 0 * y = 0
+   NOTE: can we avoid having to spec out all valid 0/n/lvar permutations (13 - see below) across x y p?"
+  [x y p]
+  (conde
+   [] ; 0 :y :p  <all>-0
+   [] ; 0  n :p  0
+   [] ; 0 :y  n  discard: no solution
+   [] ; 0  n  n  discard: no solution
+
+   [] ; :x 0 :p  <all>-0
+   [] ; :x 0  n  discard: no solution
+   [] ;  n 0 :p  0
+   [] ;  n 0  n  discard: no solution
+
+   [] ; :x :y 0  <all>-0 / 0-<all>
+   [] ;  n :y 0  0
+   [] ; :x  n 0  0
+   [] ;  n  n 0  discard: no solution
+
+   [] ;  0 0 :p  0
+   [] ;  0 0  n  discard: no solution
+
+   [] ; 0 :y 0  <all>
+   [] ; 0  n 0
+
+   [] ; :x 0 0  <all>
+   [] ;  n 0 0
+
+   [] ;  0 0 0
+
+   [(fresh [t] (lvaro x) (== () x) (nonlvaro y) (== (lcons \S t) y) (nonlvaro p) (== () p))] ; (mult-r :x n 0) ; (0 0 0)
+   [(fresh [t] (nonlvaro x) (== (lcons \S t) x) (lvaro y) (== () y) (nonlvaro p) (== () p))] ; (mult-r n :y 0) ; (0 0 0)
+   [(== () x) (lvaro y) (nonlvaro p) (== () p)] ; (mult-r 0 :y 0) ; (0 _0 0)
+   [(lvaro x) (== () y) (nonlvaro p) (== () p)] ; (mult-r :y 0 0) ; (_0 0 0)
+   [(lvaro x) (nonlvaro y) ]
+   [(fresh [xt yt c]
+      (== (lcons \S xt) x)
+      (== (lcons \S yt) y)
+      (appendo y c p)
+      (multo-v3 xt y c))]))
+
+(def multo multo-v5)
 
 (defn mult-peano-r
   "product of 2 peano numbers"
@@ -156,10 +201,7 @@
 (defn mult-r
   "x * y = p"
   ([x y p] (peano->n (mult-peano-r (n->peano x) (n->peano y) (n->peano p))))
-  ([x y p n] (peano->n (mult-peano-r (n->peano x) (n->peano y) (n->peano p) n)))
-  ; ([x y p n] (mult-peano-r (n->peano x) (n->peano y) (n->peano p) n))
-  )
-
+  ([x y p n] (peano->n (mult-peano-r (n->peano x) (n->peano y) (n->peano p) n))))
 
 (defn div-peano-r
   "x / y = q"
@@ -172,14 +214,14 @@
 (defn div-r
   "x / y = q"
   [x y q]
-  (peano->n (div-peano-r (n->peano x) (n->peano y) (n->peano q)))  )
-
+  (peano->n (div-peano-r (n->peano x) (n->peano y) (n->peano q))))
 
 ;; examples:
-;; (from-peano (addo-peano (to-peano 1) (to-peano 2) :s))  ; ((1 2 3))
-;; (from-peano (addo-peano :x :y (to-peano 3)))            ; ((0 3 3) (1 2 3) (2 1 3) (3 0 3))
-
-;; (from-peano (subo-peano (to-peano 3) (to-peano 1) :d))  ; ((3 1 2))
-;; (from-peano (subo-peano (to-peano 3) :a :b))            ; ((3 0 3) (3 1 2) (3 2 1) (3 3 0))
-;; --------------------------------------
+;; (mult-r 6 7 :p)   ; ((6 7 42))
+;; (mult-r :x :y 6)  ; ((6 1 6) (3 2 6) (2 3 6) (1 6 6))
+;; (mult-r :x 0 0)   ; ((_0 0 0))
+;; (mult-r 0 :y 0 4) ; ((0 _0 0))
 ;;
+;; (div-r 42 6 :q)   ; ((42 6 7))
+;; (div-r 42 :y :q)  ; ((42 42 1) (42 21 2) (42 14 3) (42 7 6) (42 6 7) (42 3 14) (42 2 21) (42 1 42))
+;; (div-r 42 0 :q)   ; 0
