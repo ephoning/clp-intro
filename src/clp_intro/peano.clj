@@ -106,7 +106,8 @@
    semi-broken; now terminats for the following argument sets: (:x () (S ...)) (:x :y (S ...))
    but results (in peano notation) look like:
    (mult-r :x :y 3) ; (((_0 _1 _2) (S) (S S S)) ((_0) (S S S) (S S S)))
-   reason: head elements (i.e., lvars a & d below) are/remain lvars"
+   reason: head elements (i.e., lvars a & d below) are/remain lvars when 'x' and 'y' are constructed
+   versus destructured"
   [x y p]
   (conde
    [(== () x) (== () p)]
@@ -121,7 +122,7 @@
   "x * y = p
    fix for introduction of lvars as head elements: unify head elements with S
    but results can be:
-   (mult-r 0 :y 0) ; ((0 _0 0) (0 0 0))
+   (mult-r 0 :y 0) ; ((0 _0 0) (0 0 0))    (both the 'general' and a 'specific' solution are present)
    reason: input matches multiple conde clauses"
   [x y p]
   (conde
@@ -155,7 +156,7 @@
 (defn multo-v5
   "x * y = p
    fix for ALL argument combinations containing at least one 0
-   NOTE: can we avoid having to spec out all valid 0/n/lvar permutations (see below) across x y p?"
+   Q: can we avoid having to spec out ALL valid 0/n/lvar permutations (see below) across x y p?"
   [x y p]
   (conde
    [(zero-n x) (lvaro y)     (lvaro p)  (== () p)]   ;  0 :y :p  <all>-0
@@ -187,7 +188,9 @@
 
 (defn multo-v6
   "x * y = p
-   replace multiple combinations that can be subsumed by a single alternative"
+   replace multiple combinations that can be subsumed by a single alternative
+   Q: is there a better/proper way to handle this / avoid the comb explosion of clauses?
+      (multiplication appears to be more complex than addition because of '0')"
   [x y p]
   (conde
    [(zero-n x) (lvaro y)     (lvaro p)  (== () p)]   ;  0 :y :p  <all>-0
