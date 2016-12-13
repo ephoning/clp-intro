@@ -187,7 +187,7 @@
 
 (defn multo-v6
   "x * y = p
-   replace multiple  combinations that can be subsumed by a single alternative"
+   replace multiple combinations that can be subsumed by a single alternative"
   [x y p]
   (conde
    [(zero-n x) (lvaro y)     (lvaro p)  (== () p)]   ;  0 :y :p  <all>-0

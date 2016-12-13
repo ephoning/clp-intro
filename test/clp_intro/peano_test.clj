@@ -2,7 +2,9 @@
   (:require [clojure.test :refer :all]
             [clp-intro.peano :refer :all]))
 
-(deftest mult
+;; run tests with 'lein test clp-intro.peano-test'
+
+(deftest ^:unit mult
   (is (= '((_0  0  0))  (mult-r :x  0  0)))
   (is (= '(( 0 42  0))  (mult-r  0 42 :p)))
   (is (= '((_0  0  0))  (mult-r :x  0 :p)))
@@ -17,6 +19,7 @@
   (is (= '(( 0  0  0))  (mult-r  0  0  0)))
 
   (is (= 0              (mult-r :x  0 42)))
+  (is (= 0              (mult-r  0 :y 42)))
 
   (is (= '(( 0 _0  0))  (mult-r  0 :y :p)))
 
