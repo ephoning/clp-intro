@@ -73,10 +73,12 @@ Therefore:
   CLP-F is also non-primitive and can be expressed using a CLP-P?
 
 - How about Integer / Float arithmetic?
-    - Integer is *countable infinite*, so at least a lazy approach could work
+    - Integer is *countable infinite*, so at least a lazy approach could potentially work?
     - Float is *uncountable infinite*, so no go
-    - or are we restricted to types with *GROUNDED VALUES* / algebraic types?
+    - or are we restricted to types with *GROUNDED VALUES* / algebraic/inductive/recursive types?
       (seem that way, no?: see core.logic.arithmetic: ONLY provides comparison operators for numbers - to be used as predicates/tests within run* / fresh bodies)
+      (also consider the bit-string based number representation used/explored in the later part of 'The Reasoned Schemer'...)
+
 (*) Easy: we can think of a simple recipe to get from a functional to CLP equivalent implementation
 
 *** Mixing functional with core.logic relational programming *(intro)*
