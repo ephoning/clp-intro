@@ -1,10 +1,23 @@
 (ns clp-intro.append
   (:require [clojure.core.logic :refer :all]))
 
-(defn append
+;; compact
+(defn append-v1
   "append 2 seqs - functional"
-  [a b]
-  (if (empty? a) b (cons (first a)(append (rest a) b))))
+  [l s]
+  (if (empty? l) s
+      (cons (first l)
+            (append (rest l) s))))
+
+;; spelled out to resemble structure of the relational version
+(defn append-v2
+  "append 2 seqs - functional"
+  [l s]
+  (if (empty? l) s
+      (let [a (first l)
+            d (rest l)
+            r (append d s)]
+        (cons a r))))
 
 (defn appendo
   "append 2 seqs - relational"
@@ -12,7 +25,6 @@
   (conde
    [(== '() l) (== s out)]
    [(fresh [a d r]
-      (== (lcons a d) l)  ; (also implies l != ())
-      (== (lcons a r) out)
-      (appendo d s r))])) ; make recursive call last to avoid non-termination
-                          ; when asking for non-existent answers
+      (== (lcons a d) l)   ; a == (first l), d == (rest l)
+      (== (lcons a r) out) ; out == (a . r)
+      (appendo d s r))]))  ; r == ( (rest l) s)
