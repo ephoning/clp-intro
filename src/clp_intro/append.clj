@@ -1,5 +1,5 @@
 (ns clp-intro.append
-  (:require [clojure.core.logic :refer :all]))
+  (:require [clojure.core.logic :refer :all :exclude[appendo]]))
 
 ;; compact
 (defn append-v1
@@ -7,7 +7,7 @@
   [l s]
   (if (empty? l) s
       (cons (first l)
-            (append (rest l) s))))
+            (append-v1 (rest l) s))))
 
 ;; spelled out to resemble structure of the relational version
 (defn append-v2
@@ -16,7 +16,7 @@
   (if (empty? l) s
       (let [a (first l)
             d (rest l)
-            r (append d s)]
+            r (append-v2 d s)]
         (cons a r))))
 
 (defn appendo
