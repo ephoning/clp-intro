@@ -31,12 +31,10 @@ Therefore:
      - calling regular functions from within CLP functions
 - Also: how to compose CLP functions themselves?
 
-**** The main concepts / operators
+**** The main operators / some concepts
 
 - run* / run <n>
      - interface to regular Clojure
-- lvar
-     - logical variable
 - ==
      - unification
 - fresh
@@ -45,26 +43,29 @@ Therefore:
      - try every alternative
 - lvaro, nonlvaro
      - non-relational goals ("predicates")
+- lvar
+     - logical variable
 
 **** Examples
 
-- Peano number addition:
-      - ***see code...***
 - append
       - 'appendo' is built-in, but can we define it ourselves in terms of other o-primitives
       - ***see code...***
 
+- Peano number addition and multiplication:
+      - ***see code...***
+
 **** Some Learnings
 
-- relational operators do not return values; pass in lvar argument to unify with result instead
-- relational operator are more like actions ("hidden side-effects"), so do not nest but provide one after the other
-- negation is often tricky (we need it when trying to have 'conde' behave more like 'cond')
-- ordering of invocations of relational operators is irrelevant (BUT might cause non-termination!)
+- Relational operators do not return values; pass in lvar argument to unify with result instead
+- Relational operator are more like actions ("hidden side-effects"), so do not nest but provide one after the other
+- Negation is often tricky (we need it when trying to have 'conde' behave more like 'cond')
+- Ordering of invocations of relational operators is irrelevant (BUT might cause non-termination!)
     - hint: make sure to order clauses in a run* or fresh body such that a recursive call comes last
-- cannot use sequence functions to extract parts of a value, but we can use "constructors"
+- Cannot use sequence functions to extract parts of a value, but we can use "constructors"
     - most notably: (l)cons (tries to unify an lvar with a dotted pair / improper list)
-- in short: relations do NOT behave like regular functions; they "communicate" through the lvars introduced by run* or fresh
-- strategy considerations: do we want to expose "quantifiers" to the "outside" Clojure world OR only expose "regular value instances"?
+- In short: relations do NOT behave like regular functions; they "communicate" through the lvars introduced by run* or fresh
+- Strategy considerations: do we want to expose "quantifiers" to the "outside" Clojure world OR only expose "regular value instances"?
 
 **** Questions
 
