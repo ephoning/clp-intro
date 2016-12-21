@@ -1,5 +1,5 @@
 (ns clp-intro.append
-  (:require [clojure.core.logic :refer :all :exclude[appendo]]))
+  (:require [clojure.core.logic :refer :all :exclude[appendo membero]]))
 
 ;; compact
 (defn append-v1
@@ -25,6 +25,6 @@
   (conde
    [(== '() l) (== s out)]
    [(fresh [a d r]
-      (== (lcons a d) l)   ; a == (first l), d == (rest l)
+      (== (lcons a d) l)   ; a == (first l), d == (rest l) note: implies l != ()
       (== (lcons a r) out) ; out == (a . r)
       (appendo d s r))]))  ; r == ( (rest l) s)
